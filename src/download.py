@@ -2,8 +2,7 @@
 
 Setup utility (scaffolded with AI assistance).
 
-WEEK 0 TASK: open the FAA handbook pages below in a browser, find the link
-labelled "Full Version" (full PDF), and paste the URLs into HANDBOOKS.
+The URLs in HANDBOOKS point to the "Full Version" PDF on each FAA page:
   - Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C):
     https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/phak
   - Airplane Flying Handbook (FAA-H-8083-3C):
@@ -17,10 +16,10 @@ import requests
 
 RAW_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
 
-# doc_id -> full-PDF URL  (fill these in yourself)
+# doc_id -> full-PDF URL
 HANDBOOKS = {
-    "phak": "",  # TODO(week 0)
-    "afh": "",   # TODO(week 0)
+    "phak": "https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/faa-h-8083-25c.pdf",
+    "afh": "https://www.faa.gov/sites/faa.gov/files/regulations_policies/handbooks_manuals/aviation/airplane_handbook/00_afh_full.pdf",
 }
 
 
