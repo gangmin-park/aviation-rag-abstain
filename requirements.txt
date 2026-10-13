@@ -1,0 +1,7 @@
+# Core packages (Weeks 0-3, 5-6). Installed by setup_mac.command / setup_windows.bat.
+pymupdf>=1.24
+rank-bm25>=0.2.2
+numpy>=1.26
+matplotlib>=3.8
+requests>=2.31
+pytest>=8.0

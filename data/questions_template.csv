@@ -1,0 +1,3 @@
+id,question,answerable,gold_doc,gold_page,source_note
+EXAMPLE-1,(write a question whose answer is in the handbook),1,phak,(PDF page no.),(chapter/section you checked)
+EXAMPLE-2,(write a question the handbooks cannot answer),0,,,(why it is out of scope)

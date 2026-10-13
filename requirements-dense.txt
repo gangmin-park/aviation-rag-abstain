@@ -1,0 +1,5 @@
+# Week 4 only: dense (embedding) retrieval. Pulls in PyTorch (large download).
+# Install when you reach Week 4:  pip install -r requirements-dense.txt
+# Note for Intel Macs: recent PyTorch releases no longer ship Intel-macOS wheels,
+# so this step will be checked together with Claude in Week 4 before installing.
+sentence-transformers
