@@ -11,7 +11,7 @@ A decision aid for pilots is only useful if pilots can calibrate how much to tru
 ## Data
 
 - *Pilot's Handbook of Aeronautical Knowledge* (FAA-H-8083-25C) and *Airplane Flying Handbook* (FAA-H-8083-3C), published by the U.S. Federal Aviation Administration (U.S. government works). Download with `python -m src.download`.
-- `data/questions.csv`: a hand-written evaluation set, written by the author. It mixes **answerable** questions (each with the handbook and page that supports the answer, checked by hand) and **unanswerable** questions (plausible aviation questions the handbooks do not cover).
+- `data/questions.csv`: the evaluation set (30 questions: 22 answerable, 8 unanswerable). Questions were drafted with AI assistance against the two PDFs and then verified and revised by the author; every cited page is a 1-based PDF page located by searching the handbook text, and `source_note` records the chapter and the passage it rests on. The **unanswerable** half are plausible aviation questions the handbooks do not cover, each with a note on what was searched to confirm the absence.
 - Only public civil-aviation material is used. No military or non-public data is involved.
 
 ## Method
@@ -43,4 +43,8 @@ pytest -q
 
 ## Authorship and AI assistance
 
-I designed the evaluation set, implemented the core modules (chunking, retrieval, abstention, evaluation), ran the experiments, and wrote the analysis. I used an AI assistant (Claude) as a tutor: it proposed the project structure, wrote the setup utility (`src/download.py`) and the unit-test specifications in `tests/`, and reviewed my code. All implementation commits are my own.
+I used an AI assistant (Claude) as a tutor throughout this project, and I want to be precise about who did what.
+
+**The assistant** proposed the project structure, wrote the setup utility (`src/download.py`) and the unit-test specifications in `tests/`, drafted the seed questions and located their supporting pages in the PDFs, explained the design decisions behind each module, **showed me a reference implementation of each core function**, and reviewed my code.
+
+**I** reviewed and revised the evaluation set, then wrote every core module (chunking, retrieval, abstention, evaluation) myself: for each function I studied the reference implementation and the reasoning behind it, closed it, and wrote my own version against the tests. I ran the experiments and wrote the analysis. All implementation commits are my own.
