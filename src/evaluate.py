@@ -3,7 +3,8 @@ from __future__ import annotations
 
 def recall_at_k(retrieved: list[dict], gold_doc: str, gold_page: int, k: int) -> float:
     """1.0 if any of the first k retrieved chunks has (doc, page) == gold, else 0.0."""
-    raise NotImplementedError("TODO(week 3)")
+    return 1.0 if any(c["doc"] == gold_doc and c["page"] == gold_page
+                      for c in retrieved[:k]) else 0.0
 
 
 def risk_coverage(confidences: list[float], correct: list[bool]) -> list[tuple[float, float]]:

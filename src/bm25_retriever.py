@@ -2,20 +2,20 @@
 from __future__ import annotations
 
 import re
+from rank_bm25 import BM25Okapi
 
 
 def tokenize(text: str) -> list[str]:
-    """Lowercase and split into alphanumeric tokens.
-    "Angle of Attack (AOA)!" -> ["angle", "of", "attack", "aoa"]
-    """
-    raise NotImplementedError("TODO(week 3)")
+    return re.findall(r"[a-z0-9]+", text.lower())
 
 
 class BM25Retriever:
     def __init__(self, chunks: list[dict]):
-        """Build a BM25 index over chunk["text"].  Hint: rank_bm25.BM25Okapi"""
-        raise NotImplementedError("TODO(week 3)")
+        self.chunks = chunks
+        self.bm25 = BM25Okapi([tokenize(c["text"]) for c in chunks])
 
     def search(self, query: str, k: int = 5) -> list[tuple[dict, float]]:
-        """Return the top-k (chunk, score) pairs, highest score first."""
-        raise NotImplementedError("TODO(week 3)")
+        scores = self.bm25.get_scores(tokenize(query))
+        order = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:k]
+        return [(self.chunks[i], float(scores[i])) for i in order]
+
