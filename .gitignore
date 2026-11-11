@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 data/raw/
 data/processed/
+data/cache/
 .ipynb_checkpoints/
 .pytest_cache/
 # personal context for Claude Code (not for the public repo)
@@ -10,4 +11,3 @@ CLAUDE.md
 CLAUDE.local.md
 notes/
 .claude/
-data/cache/
