@@ -6,6 +6,7 @@ data/processed/
 data/cache/
 .ipynb_checkpoints/
 .pytest_cache/
+.DS_Store
 # personal context for Claude Code (not for the public repo)
 CLAUDE.md
 CLAUDE.local.md

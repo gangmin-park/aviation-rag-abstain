@@ -1,5 +1,21 @@
-# Week 4 only: dense (embedding) retrieval. Pulls in PyTorch (large download).
-# Install when you reach Week 4:  pip install -r requirements-dense.txt
-# Note for Intel Macs: recent PyTorch releases no longer ship Intel-macOS wheels,
-# so this step will be checked together with Claude in Week 4 before installing.
-sentence-transformers
+# Dense (embedding) retrieval. Install into a SEPARATE Python 3.12 environment.
+#
+# Why separate: the last PyTorch release shipping Intel-macOS (x86_64) wheels is
+# 2.2.2, and that release supports Python 3.8-3.12 only. The main .venv for this
+# project runs 3.13, so there is no version of PyTorch it can install. On Apple
+# Silicon or Linux you can install these into the main environment instead.
+#
+#   conda create -n dense python=3.12 -y
+#   conda run -n dense pip install -r requirements-dense.txt
+#
+# The pins matter. torch 2.2.2 is from early 2024: unpinned, pip resolves numpy 2.x
+# (ABI mismatch, "_ARRAY_API not found") and transformers 5.x (which disables torch
+# outright, requiring >= 2.6). Keep this stack on its 2024-era versions.
+#
+# PyMuPDF has no Python 3.12 x86-macOS wheel, so this environment cannot read the
+# PDFs. Export chunks from the main environment first and load them here as JSON.
+torch==2.2.2
+sentence-transformers==2.7.0
+transformers==4.39.3
+numpy<2
+rank-bm25>=0.2.2
