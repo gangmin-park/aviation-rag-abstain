@@ -7,17 +7,16 @@ value, then answer only above a threshold.
 from __future__ import annotations
 
 def confidence(scores: list[float], method: str = "margin") -> float:
-    """Map a ranked score list (highest first) to a single confidence number.
-
-    method="top1"   -> scores[0]
-    method="margin" -> scores[0] - scores[1]   (0.0 if fewer than 2 scores)
-    Empty list -> 0.0
-    You may add your own methods later and compare them — that comparison
-    is a result worth reporting.
-    """
-    raise NotImplementedError("TODO(week 5)")
+    if not scores:
+        return 0.0
+    if method == "top1":
+        return float(scores[0])
+    if method == "margin":
+        return float(scores[0] - scores[1]) if len(scores) > 1 else 0.0
+    raise ValueError(f"unknown method: {method}")
 
 
 def decide(conf: float, threshold: float) -> bool:
-    """True = answer, False = abstain.  Answer when conf >= threshold."""
-    raise NotImplementedError("TODO(week 5)")
+    return bool(conf >= threshold)
+
+

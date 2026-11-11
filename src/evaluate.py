@@ -8,18 +8,18 @@ def recall_at_k(retrieved: list[dict], gold_doc: str, gold_page: int, k: int) ->
 
 
 def risk_coverage(confidences: list[float], correct: list[bool]) -> list[tuple[float, float]]:
-    """Risk-coverage curve for selective answering.
+    n_total = len(confidences)
+    order = sorted(range(n_total), key=lambda i: confidences[i], reverse=True)
 
-    Sort questions by confidence (highest first). For n = 1..N, answering only
-    the top-n questions gives:
-        coverage = n / N
-        risk     = (number of wrong answers among those n) / n
-    Return the list of (coverage, risk) for n = 1..N.
-    An unanswerable question that the system answers counts as wrong.
-    """
-    raise NotImplementedError("TODO(week 5)")
+    curve = []
+    wrong = 0
+    for n, i in enumerate(order, start=1):
+        if not correct[i]:
+            wrong += 1
+        curve.append((n / n_total, wrong / n))
+    return curve
 
 
 def aurc(curve: list[tuple[float, float]]) -> float:
-    """Area under the risk-coverage curve = mean of the risk values. Lower is better."""
-    raise NotImplementedError("TODO(week 5)")
+    return sum(risk for _, risk in curve) / len(curve)
+
