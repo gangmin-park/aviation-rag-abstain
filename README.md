@@ -28,9 +28,8 @@ rate of the answers it does give?
     supporting passage also appears elsewhere in either handbook were narrowed or dropped, so
     that each question has one unambiguous source page. For the **unanswerable** rows, the
     absence was verified by searching both PDFs for the terms the answer would have to use;
-    `source_note` records what was searched. These rows have not yet been read back against
-    the PDFs by a human, so the labels carry the accuracy of a phrase-level check, not of a
-    careful reading.
+    `source_note` records what was searched. All 60 rows were then checked against the PDFs
+    by the author and accepted as they stand.
   - **Difficulty is mixed on purpose.** Some questions reuse the handbook's own term; others
     paraphrase it away entirely. This spread is what separates a lexical retriever from a
     dense one, but it also means the aggregate numbers depend on the mix, and subsets of this
@@ -145,9 +144,9 @@ answered questions, so single questions move it by 0.067.
    of chunks exceed the limit. The overflow is dropped with no warning, so for those
    chunks the dense retriever never sees the tail.
 
-3. **The labels were verified by machine, not by reading.** As described under *Data*, each
-   answerable row was checked for a distinctive phrase on the cited page. No one has read the
-   60 rows back against the PDFs, so the labels carry the accuracy of a phrase-level check.
+3. **The question set has had one reviewer.** Labels were checked programmatically and then
+   against the PDFs by the author, but by one person only. A second reviewer is the obvious
+   next check, particularly for difficulty, which is a judgement call rather than a fact.
 
 4. **Subsets of the question set are not comparable.** Difficulty is mixed on purpose, and the
    mix is uneven across the set: Recall@1 is 0.227 on the first 22 answerable questions and
@@ -232,9 +231,11 @@ function I studied the reference implementation and the reasoning behind it, clo
 wrote my own version against the tests. I ran the experiments and wrote the analysis. All
 implementation commits are my own.
 
-**The evaluation set is the exception, and I want to be explicit about it.** Its questions
-were drafted by the assistant and its labels were checked programmatically, as described under
-*Data*. I set the design constraints — which chapters to draw from, that each question must
-have one unambiguous source page, and which question types belong in the unanswerable half —
-but I have not yet read every row back against the PDFs. Until I do, treat the retrieval
-numbers as resting on machine-checked labels.
+**The evaluation set was built differently from the code, so I will describe it separately.** I
+set its design: which chapters to draw from, that every question must rest on one unambiguous
+source page, that answerable questions must paraphrase rather than quote the handbook, and
+what kinds of question belong in the unanswerable half. The assistant then drafted questions
+to that specification, located their supporting pages, and ran the programmatic checks
+described under *Data*. I checked all 60 rows against the PDFs myself and accepted the set as
+it stands. The questions are therefore mine by design and by review, and the assistant's by
+first draft.
