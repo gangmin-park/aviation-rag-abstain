@@ -249,10 +249,8 @@ PDFs: export the chunks from the main environment as JSON and load them there.
 
 ## Authorship and AI assistance
 
-I am teaching myself computer science alongside a demanding full-time job, without access to
-anyone who could advise me on this field or read my code with me. An AI assistant (Claude) was
-the only form of tutoring available to me, and I used it throughout this project. For that
-reason I would rather state precisely what it did than leave it unsaid.
+I used an AI assistant (Claude) throughout this project, as a tutor and a reviewer. This
+section states exactly what it did and what I did.
 
 **I** wrote every core module — chunking, retrieval, abstention, evaluation — myself. For each
 function I studied a reference implementation and the reasoning behind it, closed it, and wrote
@@ -261,15 +259,14 @@ the analysis, including the findings above and the limitations that qualify them
 implementation commits are my own.
 
 **The assistant** proposed the project structure, wrote the setup utility (`src/download.py`)
-and the unit-test specifications in `tests/`, drafted the seed questions and located their
-supporting pages in the PDFs, explained the design decisions behind each module, **showed me a
-reference implementation of each core function**, and reviewed my code.
+and the unit-test specifications in `tests/`, supplied the reference implementations described
+above, drafted the seed questions and located their supporting pages in the PDFs, explained the
+design decisions behind each module, and reviewed my code.
 
 **The evaluation set was built differently from the code, so I will describe it separately.** I
 set its design: which chapters to draw from, that every question must rest on one unambiguous
-source page, that answerable questions must paraphrase rather than quote the handbook, and
-what kinds of question belong in the unanswerable half. The assistant then drafted questions
-to that specification, located their supporting pages, and ran the programmatic checks
-described under *Data*. I checked all 60 rows against the PDFs myself and accepted the set as
-it stands. The questions are therefore mine by design and by review, and the assistant's by
-first draft.
+source page, that answerable questions must paraphrase rather than quote the handbook, and what
+kinds of question belong in the unanswerable half. The assistant drafted questions to that
+specification, located their supporting pages, and ran the programmatic checks described under
+*Data*. I checked all 60 rows against the PDFs myself and accepted the set as it stands. The
+set as it stands is mine by design and by review.
