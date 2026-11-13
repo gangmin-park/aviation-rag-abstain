@@ -1,7 +1,18 @@
 # Knowing When Not to Answer: Abstaining Retrieval over FAA Flight-Training Handbooks
 
+A retrieval pipeline over two public FAA handbooks that cites an exact page for every passage
+it returns, and measures whether it can tell when the handbooks do not support an answer at
+all.
+
+**Finding.** A plain BM25 score separates supported from unsupported questions with an AUROC
+of 0.952 — higher than the dense retriever that beats it at finding passages (0.709). Answering
+only the most confident half of the questions removes every unsupported answer. **The better
+retriever is the worse abstainer**, and the reason is measurable: cosine similarity is bounded,
+so a sentence encoder has no way to score "nothing here matches".
+
 > Status: **v0.2** (started October 2026). The retrieval comparison, the abstention experiment
 > and the risk-coverage analysis are complete; *Limitations* says what they do not cover.
+> `pytest -q` passes 9 tests covering chunking, retrieval and the metrics.
 
 ## Motivation
 
@@ -65,7 +76,7 @@ unsupported question at all.
 | BM25 | 0.364 | 0.636 |
 | Dense (`all-MiniLM-L6-v2`) | 0.364 | **0.705** |
 
-Dense retrieval recovers 9 of the questions BM25 misses at k=5, and loses 6. The split is
+Dense retrieval recovers 9 of the questions BM25 misses at Recall@5, and loses 6. The split is
 sharp, and it runs along vocabulary: when the handbook's own term is absent from the
 question, dense wins; when the term appears verbatim, BM25 wins.
 
@@ -82,7 +93,7 @@ than an unanswerable one. 0.5 is chance; 1.0 is perfect separation.
 | Retriever | top-1 score | margin |
 |---|---|---|
 | BM25 | **0.952** | 0.482 |
-| Dense | 0.709 | 0.514 |
+| Dense (`all-MiniLM-L6-v2`) | 0.709 | 0.514 |
 
 **Why margin fails.** Overlapping windows make the first and second hit near-duplicates of
 each other. In 17 of the 60 questions (28.3%) the top two chunks come from the same page,
@@ -116,6 +127,10 @@ score to decide whether to answer at all.
 | BM25 | top-1 | top-1 | 0.540 |
 
 ![Risk-coverage curves over 60 questions](docs/risk_coverage.png)
+
+*Each curve sweeps every confidence threshold at once: the point at coverage c is the error
+rate when only the c most confident questions are answered. The left panel counts an answer
+correct only if the gold page is ranked first; the right panel allows it anywhere in the top 5.*
 
 AURC summarises the whole curve, but it hides which kind of error is being traded away.
 Splitting the same run by outcome shows that:
@@ -156,11 +171,7 @@ answered questions, so single questions move it by 0.067.
    writes an answer. "Correct" means the gold page was retrieved, not that a correct
    answer was produced.
 
-6. **Answers are bounded by the two handbooks.** Because every answer must rest on the
-   corpus, questions whose evidence lives elsewhere cannot be answered at all, however
-   reasonable they are to ask.
-
-7. **Coverage trades one failure against another, and the numbers thin out as it falls.**
+6. **Coverage trades one failure against another, and the numbers thin out as it falls.**
    Raising coverage means answering more questions the corpus does not support; lowering it
    means staying silent on questions it does. The crossover sits near 50%, as the table above
    shows. Below that the sample also thins: 15 questions are answered at 25% coverage, where a
@@ -168,25 +179,47 @@ answered questions, so single questions move it by 0.067.
    intent of the question and the content of the supporting passage more finely than a
    retrieval score can.
 
-8. **Risk does not count the cost of abstaining.** Risk is the error rate among answered
+7. **Risk does not count the cost of abstaining.** Risk is the error rate among answered
    questions only, so a system that answers nothing scores a perfect 0. The four-outcome
    table is reported alongside it for that reason.
 
-9. **Compound (multi-hop) questions are out of scope.** `gold_page` holds a single page,
+8. **Compound (multi-hop) questions are out of scope.** `gold_page` holds a single page,
    so a question whose evidence spans two pages can be neither labelled nor scored. The
    question set was built from single-page evidence throughout.
 
-10. **What counts as "unanswerable" is a function of the corpus.** Of the 16 unanswerable
-    questions, only 2 — both asking for real-time information — could not be answered by
-    any fixed document. The other 14 are covered by other FAA publications or by
-    manufacturer documentation.
+9. **What counts as "unanswerable" is a function of the corpus.** Every answer must rest on
+   these two handbooks, so a question whose evidence lives elsewhere cannot be answered however
+   reasonable it is to ask. Of the 16 unanswerable questions, only 2 — both asking for real-time
+   information — could not be answered by any fixed document; the other 14 are covered by other
+   FAA publications or by manufacturer documentation.
+
+## Future work
 
 This project tests a measuring instrument rather than a finished system. It was built on a
-deliberately limited corpus and question set, and its aim was to locate the boundary where
-the evidence runs out and to see whether that boundary can be detected. Every corpus has
-such a boundary, and a system meant to be trusted has to recognise it and act on it. From
-here I intend to work on analysing compound questions and on what a system should do with
-the questions it cannot answer.
+deliberately limited corpus and question set, and its aim was to locate the boundary where the
+evidence runs out and to see whether that boundary can be detected. Every corpus has such a
+boundary, and a system meant to be trusted has to recognise it and act on it.
+
+Three directions follow from the measurements above, in the order I would take them.
+
+1. **Reranking, where the headroom is already measured.** Recall@1 is 0.364, but the gold page
+   is inside the top 20 of the two retrievers combined for **93.2%** of questions. The right
+   passage is almost always retrieved and almost never ranked first, which is a reranking
+   problem rather than a retrieval one. A cross-encoder over those candidates is the obvious
+   next experiment, and its score becomes a third confidence signal to test against the 0.952
+   that BM25 already reaches with top-1 alone.
+2. **Compound questions.** Supporting evidence that spans two pages needs a multi-page label
+   and a scoring rule to match, which in turn needs a question set built for it. That is a
+   change to the measuring instrument, not an addition to the pipeline, which is why it sits
+   outside this version.
+3. **A confidence signal that reads the passage, not just the score.** The crossover at 50%
+   coverage is the limit of what a scalar retrieval score can do. Going past it means judging
+   whether the retrieved text actually answers the question asked — the point at which this
+   becomes a calibration problem rather than a ranking one.
+
+Fusing the two retrievers was tried and is reported here as a negative result: reciprocal rank
+fusion raised Recall@5 to 0.773 but dropped Recall@1 to 0.295, below either retriever alone.
+With only two systems, fusion widens the candidate pool and blurs the top of it.
 
 ## How to run
 
@@ -221,15 +254,16 @@ anyone who could advise me on this field or read my code with me. An AI assistan
 the only form of tutoring available to me, and I used it throughout this project. For that
 reason I would rather state precisely what it did than leave it unsaid.
 
+**I** wrote every core module — chunking, retrieval, abstention, evaluation — myself. For each
+function I studied a reference implementation and the reasoning behind it, closed it, and wrote
+my own version against the tests. I ran every experiment, decided what to measure, and wrote
+the analysis, including the findings above and the limitations that qualify them. All
+implementation commits are my own.
+
 **The assistant** proposed the project structure, wrote the setup utility (`src/download.py`)
 and the unit-test specifications in `tests/`, drafted the seed questions and located their
 supporting pages in the PDFs, explained the design decisions behind each module, **showed me a
 reference implementation of each core function**, and reviewed my code.
-
-**I** wrote every core module (chunking, retrieval, abstention, evaluation) myself: for each
-function I studied the reference implementation and the reasoning behind it, closed it, and
-wrote my own version against the tests. I ran the experiments and wrote the analysis. All
-implementation commits are my own.
 
 **The evaluation set was built differently from the code, so I will describe it separately.** I
 set its design: which chapters to draw from, that every question must rest on one unambiguous
